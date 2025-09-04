@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roleta do Drinking Game - Praia</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow-x: hidden;
+            background: #1a2a6c;
+        }
+        
+        .background-mosaic {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 5px;
+            padding: 5px;
+        }
+        
+        .mosaic-item {
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+            transition: transform 0.3s ease;
+        }
+        
+        .mosaic-item:hover {
+            transform: scale(1.03);
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            z-index: 1;
+            padding: 20px;
+            background: rgba(10, 20, 60, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin: 20px;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #FFD700;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #f8f8f8;
+        }
+        
+        .beach-theme {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            font-size: 2rem;
+        }
+        
+        .beach-theme i {
+            margin: 0 10px;
+            color: #FFD700;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto 30px;
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 10px solid #2c3e50;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.21, 0.99);
+            background: #34495e;
+        }
+        
+        .section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
+            left: 0;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        }
+        
+        .section-content {
+            transform: rotate(45deg);
+            text-align: center;
+            width: 90px;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .section-number {
+            font-size: 0.1rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+        
+        .custom-pointer {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            z-index: 11;
+            border-radius: 50%;
+            background: #ff6b6b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+            font-size: 1.5rem;
+        }
+        
+        .result {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .result-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            line-height: 1.4;
+            color: #FFD700;
+        }
+        
+        .spin-button {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .spin-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
+            background: linear-gradient(to right, #ff4b2b, #ff416c);
+        }
+        
+        .spin-button:active {
+            transform: translateY(2px);
+        }
+        
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        @media (max-width: 600px) {
+            .background-mosaic {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+            }
+            
+            .wheel-container {
+                width: 320px;
+                height: 320px;
+            }
+            
+            .section-content {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .section-number {
+                font-size: 1.3rem;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .result-text {
+                font-size: 1.2rem;
+            }
+            
+            .spin-button {
+                padding: 12px 30px;
+                font-size: 1.1rem;
+            }
+            
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-mosaic" id="background-mosaic"></div>
+    <div class="container">
+        <div class="header">
+            <h1>Roleta do Drinking Game</h1>
+            <p class="subtitle">Gire a roleta e descubra a próxima prenda!</p>
+            <div class="beach-theme">
+                <i class="fas fa-umbrella-beach"></i>
+                <i class="fas fa-cocktail"></i>
+                <i class="fas fa-glass-cheers"></i>
+                <i class="fas fa-music"></i>
+                <i class="fas fa-sun"></i>
+            </div>
+        </div>
+        
+        <div class="wheel-container">
+            <div class="custom-pointer">
+                <i class="fas fa-laugh"></i>
+            </div>
+            <div class="wheel" id="wheel"></div>
+        </div>
+        
+        <button class="spin-button" id="spin">
+            <i class="fas fa-redo-alt"></i> Girar Roleta
+        </button>
+        
+        <div class="result">
+            <div class="result-title">Prenda ou Bônus sorteado :</div>
+            <div class="result-text" id="result">A roleta ainda não foi girada</div>
+        </div>
+        
+        <div class="footer">
+            <p>Divirta-se com responsabilidade! 🍹😊</p>
+        </div>
+    </div>
+
+    <script>
+        // Lista de prendas para a roleta (atualizada conforme solicitado)
+        const prizes = [
+            "Rei/Rainha: Decrete um shot para qualquer pessoa",
+            "Shot em Dupla: Escolha alguém para tomar um shot com você",
+            "Mestre dos Brindes: Todo mundo toma um shot, menos você",
+            "Vale-Desafio: Desafie alguém para pedra-papel-tesoura. Perdedor toma um gole da sua bebida",
+            "Roleta Russa: Prepare 3 copos (2 neutros/1 cachaça). Escolha alguém, de olhos fechados a pessoa deve escolher e tomar",
+            "Ditador do Shot: Escolha a mistura do próximo shot coletivo",
+            "Espalha o Amor: Distribua DOIS shots para quem você quiser",
+            "Coroa o palhaço pagliacci, o shot vai para o mais pesa clima do rolê",
+            "Triângulo do Amor: Escolha DUAS pessoas para tomar um golão com você",
+            "Hora do Espelho: Faça uma pose. O último a copiar toma um gole",
+            "Terremoto: Grite 'TERREMOTO!'. O último a se agachar toma um gole",
+            "Passa o Microfone: Comece a cantar. A roda gira, quem travar ou errar a letra toma gole",
+            "Azarou!: Toma DOIS shots seguidos",
+            "Faz o L!: Toma um shot sozinho",
+            "Presente de Grego: Abasteça a mesa de shots para todo mundo, inclusive você",
+            "Imunidade!: Ganhe um vale-imunidade para recusar um shot",
+            "Passe Livre: Não faz nada. Próximo campeão gira a roleta",
+            "Mestre do Tempo: Pode CANCELAR a prenda de alguém no futuro",
+            "Shot da Honra: Tome um shot em homenagem à pessoa mais animada",
+            "Reviravolta do Bem: Tome outro shot em dupla com quem já tomou"
+        ];
+
+        // URLs das imagens de fundo (todas as que você forneceu)
+        const backgroundImageUrls = [
+            "https://i.pinimg.com/736x/c5/eb/14/c5eb1430048a722f1348d2efc32e7378.jpg",
+            "https://i.pinimg.com/736x/34/e4/27/34e42713dad792d0190dc7dc575389c1.jpg",
+            "https://i.pinimg.com/1200x/94/10/d8/9410d8001c4e19b827ec53ecacd69624.jpg",
+            "https://i.pinimg.com/1200x/be/ff/8a/beff8af4fc63e4c9948e05d7b1eff26f.jpg",
+            "https://i.pinimg.com/736x/e5/a7/52/e5a752beeb8985179b97801a3f949107.jpg",
+            "https://i.pinimg.com/1200x/ed/a5/88/eda588141091d90c410e56b280749150.jpg",
+            "https://i.pinimg.com/736x/ac/9c/8b/ac9c8bf0c03f37da242943fc97b590b6.jpg",
+            "https://i.pinimg.com/736x/4c/05/56/4c0556d53dd559d452ed8feaee1d33fb.jpg",
+            "https://i.pinimg.com/736x/6f/a1/80/6fa1803d1fe12666a190d76183b7c1a9.jpg",
+            "https://i.pinimg.com/736x/06/19/58/061958794bd857a4269c01ab626fbccc.jpg",
+            "https://i.pinimg.com/736x/0e/fb/61/0efb6114dea714848e0bb9fdfae651aa.jpg",
+            "https://i.pinimg.com/736x/1d/18/f7/1d18f78662622641c41bca42afa4fe42.jpg",
+            "https://i.pinimg.com/736x/62/97/e3/6297e3fcc22205c917a5ea803cdb7776.jpg",
+            "https://i.pinimg.com/736x/f0/05/eb/f005eb5390073c38d850ca3395014298.jpg",
+            "https://i.pinimg.com/736x/58/35/60/58356022805486640a7b0592ad1d4076.jpg",
+            "https://i.pinimg.com/736x/e2/f4/69/e2f469dc802aa793639704330d7c60e1.jpg",
+            "https://i.pinimg.com/1200x/fe/bb/51/febb515a262a4933982ce58c2e069d0a.jpg",
+            "https://i.pinimg.com/736x/8e/66/05/8e660580e2cdb183997718eb303f7248.jpg",
+            "https://i.pinimg.com/736x/c5/33/b3/c533b3704e00cbabc6c2f553b9fa3925.jpg",
+            "https://i.pinimg.com/736x/7f/8e/98/7f8e9882b34749fe4c176366f93e89dc.jpg",
+            "https://i.pinimg.com/1200x/ef/90/3d/ef903d68c741f7e4a3b86407d348ab10.jpg",
+            "https://i.pinimg.com/1200x/cb/ed/89/cbed89c90545286f2d74c4fcd85e4dfc.jpg",
+            "https://i.pinimg.com/736x/cc/ff/aa/ccffaa89c963c59d74f9c3f0ed5f1402.jpg",
+            "https://i.pinimg.com/736x/51/ec/f2/51ecf23a9992436ee06b673bb97b5b76.jpg",
+            "https://i.pinimg.com/736x/9f/51/c5/9f51c5fd956f994a6ab746b7e506c81a.jpg",
+            "https://i.pinimg.com/736x/0c/01/a9/0c01a924a511e4b3ee6e4b19db56544a.jpg",
+            "https://i.pinimg.com/originals/c3/d7/bf/c3d7bf2ee26feecd453eaa0150189e3b.jpg",
+            "https://i.pinimg.com/736x/d0/44/c1/d044c1bfef3156edb45a80121884943c.jpg",
+            "https://i.pinimg.com/736x/75/e5/d6/75e5d609668af275471e2ccc59c0e6fa.jpg",
+            "https://i.pinimg.com/736x/47/aa/53/47aa53eff17d2d59cb1a0fbcc018b54e.jpg"
+
+        ];
+
+        const wheel = document.getElementById('wheel');
+        const spinButton = document.getElementById('spin');
+        const resultText = document.getElementById('result');
+        const backgroundMosaic = document.getElementById('background-mosaic');
+        let isSpinning = false;
+
+        // Adicionar imagens de fundo em formato de mosaico
+        function addBackgroundMosaic() {
+            // Usar apenas as primeiras 12 imagens para o mosaico 4x3
+            const imagesToUse = backgroundImageUrls.slice(0, 24);
+            
+            imagesToUse.forEach((url) => {
+                const item = document.createElement('div');
+                item.className = 'mosaic-item';
+                item.style.backgroundImage = `url('${url}')`;
+                backgroundMosaic.appendChild(item);
+            });
+        }
+  function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // Adicionar imagens de fundo em formato de mosaico
+    function addBackgroundMosaic() {
+        // Embaralhar a lista de URLs das imagens
+        const shuffledImages = shuffleArray([...backgroundImageUrls]);
+        
+        // Usar as primeiras 20 imagens para o mosaico 5x4
+        const imagesToUse = shuffledImages.slice(0, 24);
+        
+        imagesToUse.forEach((url) => {
+            const item = document.createElement('div');
+            item.className = 'mosaic-item';
+            item.style.backgroundImage = `url('${url}')`;
+            backgroundMosaic.appendChild(item);
+        });
+    }
+
+        // Gerar cores para os setores
+        function getColor(index) {
+            const colors = [
+                '#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE',
+                '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE',
+                '#B2FF59', '#EEFF41', '#FFFF00', '#FFD740', '#FFAB40',
+                '#FF6E40', '#8D6E63', '#BDBDBD', '#90A4AE', '#26A69A'
+            ];
+            return colors[index % colors.length];
+        }
+
+        // Criar a roleta
+        function createWheel() {
+            wheel.innerHTML = '';
+            const sectionAngle = 360 / prizes.length;
+            
+            prizes.forEach((prize, index) => {
+                const section = document.createElement('div');
+                section.className = 'section';
+                section.style.transform = `rotate(${index * sectionAngle}deg)`;
+                section.style.backgroundColor = getColor(index);
+                
+                const sectionContent = document.createElement('div');
+                sectionContent.className = 'section-content';
+                
+                const number = document.createElement('div');
+                number.className = 'section-number';
+                number.textContent = index + 1;
+                
+                sectionContent.appendChild(number);
+                section.appendChild(sectionContent);
+                wheel.appendChild(section);
+            });
+        }
+
+        // Girar a roleta
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            resultText.textContent = "Girando...";
+            
+            const degrees = 1800 + Math.floor(Math.random() * 360);
+            const prizeIndex = Math.floor(Math.random() * prizes.length);
+            
+            wheel.style.transform = `rotate(${degrees}deg)`;
+            
+            setTimeout(() => {
+                resultText.textContent = prizes[prizeIndex];
+                isSpinning = false;
+                
+                // Efeito de confete (simulado com alerta visual)
+                resultText.style.color = '#FFD700';
+                resultText.style.textShadow = '0 0 12px rgba(255, 215, 0, 0.9)';
+                setTimeout(() => {
+                    resultText.style.color = '#FFD700';
+                    resultText.style.textShadow = '1px 1px 3px rgba(0, 0, 0, 0.5)';
+                }, 2000);
+                
+            }, 4000);
+        }
+
+        // Inicializar a roleta e mosaico de fundo
+        addBackgroundMosaic();
+        createWheel();
+
+        // Event listeners
+        spinButton.addEventListener('click', spinWheel);
+    </script>
+</body>
+</html>
