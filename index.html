@@ -322,7 +322,12 @@
             "Passe Livre: Não faz nada. Próximo campeão gira a roleta",
             "Mestre do Tempo: Pode CANCELAR a prenda de alguém no futuro",
             "Shot da Honra: Tome um shot em homenagem à pessoa mais animada",
-            "Reviravolta do Bem: Tome outro shot em dupla com quem já tomou"
+            "Reviravolta do Bem: Tome outro shot em dupla com quem já tomou",
+            "Capitalismo: Exproprie o drink de alguém e beba",
+            "Comunismo: Todos bebem um golão de suas respectivas bebidas",
+            "Bêbado com cu na mão do palhaço: Julgue quem está mais bêbado, essa pessoa, deve virar um shot",
+            "Relacionamento aberto: escolha um CASAL, você e o casal viram um shot",
+            "Jogo dos tronos: Você também se torna um Rei/Rainha do Caos."
         ];
 
         // URLs das imagens de fundo (todas as que você forneceu)
@@ -356,7 +361,13 @@
             "https://i.pinimg.com/originals/c3/d7/bf/c3d7bf2ee26feecd453eaa0150189e3b.jpg",
             "https://i.pinimg.com/736x/d0/44/c1/d044c1bfef3156edb45a80121884943c.jpg",
             "https://i.pinimg.com/736x/75/e5/d6/75e5d609668af275471e2ccc59c0e6fa.jpg",
-            "https://i.pinimg.com/736x/47/aa/53/47aa53eff17d2d59cb1a0fbcc018b54e.jpg"
+            "https://i.pinimg.com/736x/47/aa/53/47aa53eff17d2d59cb1a0fbcc018b54e.jpg",
+            "https://i.pinimg.com/736x/ab/74/6d/ab746d31a20a7d37705497f086759d24.jpg",
+            "https://i.pinimg.com/736x/0b/7e/b8/0b7eb840d61cfaf208e39b40a22530dd.jpg",
+            "https://i.pinimg.com/736x/bd/da/6f/bdda6f05810e07c4897e39cf61b2b00f.jpg",
+            "https://i.pinimg.com/736x/d7/92/cf/d792cfcdbcf5f67ca93fb1e3b3b0c0ff.jpg",
+            "https://i.pinimg.com/736x/47/eb/27/47eb27efc49c5bf432e065c0a687e961.jpg",
+            "https://i.pinimg.com/736x/74/6f/a4/746fa4ed429e3a570af0330f28da6bc9.jpg"
 
         ];
 
@@ -378,6 +389,79 @@
                 backgroundMosaic.appendChild(item);
             });
         }
+const prizeWeights = [
+    3, // Rei/Rainha
+    2, // Shot em Dupla
+    3, // Mestre dos Brindes
+    5, // Vale-Desafio
+    3, // Roleta Russa (mais raro)
+    2, // Ditador do Shot
+    2, // Espalha o Amor
+    3, // Coroa o palhaço
+    4, // Triângulo do Amor
+    5, // Hora do Espelho
+    5, // Terremoto
+    4, // Passa o Microfone
+    1, // Azarou! (mais raro)
+    2, // Faz o L!
+    3, // Presente de Grego
+    2, // Imunidade!
+    2, // Passe Livre
+    2, // Mestre do Tempo
+    2, // Shot da Honra
+    3, // Reviravolta do Bem
+    3, // Capitalismo
+    2, // Comunismo
+    1,//Bêbado com o cu na mão do palhaço
+    1,
+    0.5
+];
+
+// Função para selecionar uma prenda baseada nos pesos
+function getWeightedPrize() {
+    // Cria um array expandido baseado nos pesos
+    let weightedArray = [];
+    
+    prizes.forEach((prize, index) => {
+        // Adiciona o índice da prenda múltiplas vezes baseado no peso
+        for (let i = 0; i < prizeWeights[index]; i++) {
+            weightedArray.push(index);
+        }
+    });
+    
+    // Seleciona um índice aleatório do array expandido
+    const randomIndex = Math.floor(Math.random() * weightedArray.length);
+    return weightedArray[randomIndex];
+}
+
+// Modifique a função spinWheel para usar o sistema ponderado
+function spinWheel() {
+    if (isSpinning) return;
+    
+    isSpinning = true;
+    resultText.textContent = "Girando...";
+    
+    const degrees = 1800 + Math.floor(Math.random() * 360);
+    
+    // Use a função ponderada em vez de Math.random()
+    const prizeIndex = getWeightedPrize();
+    
+    wheel.style.transform = `rotate(${degrees}deg)`;
+    
+    setTimeout(() => {
+        resultText.textContent = prizes[prizeIndex];
+        isSpinning = false;
+        
+        // Destacar a prenda sorteada
+        resultText.style.color = '#FFD700';
+        resultText.style.textShadow = '0 0 10px rgba(255, 215, 0, 0.8)';
+        setTimeout(() => {
+            resultText.style.color = 'white';
+            resultText.style.textShadow = '1px 1px 2px rgba(0, 0, 0, 0.5)';
+        }, 2000);
+        
+    }, 4000);
+}
   function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
